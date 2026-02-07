@@ -25,7 +25,7 @@ Our system is modularized into four specialized repositories. Here is how they f
 - **Static Testing Modules:** Runs rapid checks for "Entropy" (obfuscated code), dangerous API calls, and known malicious signatures.
 - **Tech:** JavaScript/Python, Regex Engines.
 
-**Repository:** [Link to static_params](#)
+**Repository:** [Link to static_params](https://github.com/ArgusPanipath/static_params)
 
 ---
 
@@ -40,7 +40,7 @@ Our system is modularized into four specialized repositories. Here is how they f
 - **Cluster Analysis:** Identifies "Dependency Clusters" to help the Auditor prioritize high-impact libraries.
 - **Neo4j Integration:** Stores the "Shadow Graph" for fast lookups without querying the public registry API every time.
 
-**Repository:** [Link to Dependancy_graph_builder](#)
+**Repository:** [Link to Dependancy_graph_builder](https://github.com/ArgusPanipath/Dependancy_graph_builder)
 
 ---
 
@@ -55,7 +55,7 @@ Our system is modularized into four specialized repositories. Here is how they f
 - **Final Conscience:** Aggregates votes from different models to reach a "Decision Box" verdict (Flag/Alert).
 - **Context Saving:** Packages the reasoning to be stored on the Blockchain.
 
-**Repository:** [Link to llm-council](#)
+**Repository:** [Link to llm-council](https://github.com/ArgusPanipath/llm-council)
 
 ---
 
@@ -77,9 +77,26 @@ Our system is modularized into four specialized repositories. Here is how they f
 - **RAG Vulnerability Finder:** Queries the Vector DB for historical attack patterns.
 - **Blockchain Commit:** Writes the final audit report to the immutable ledger.
 
-**Repository:** [Link to LeaderElection](#)
+**Repository:** [Link to LeaderElection](https://github.com/ArgusPanipath/LeaderElection)
 
 ---
+
+### 5. **GOLEM** (The Immutable Ledger / The Settlement Layer)
+
+**Role:** The Decentralized Registry & Verdict Store.
+
+**Function:** Acts as the final source of truth for the entire ecosystem. It anchors the analysis results from the llm-council and LeaderElection layers onto the Polygon blockchain, ensuring that security verdicts are transparent, immutable, and cryptographically verifiable.
+
+#### Key Capabilities:
+**Smart Contract Architecture:** Deploys the PackageRegistry and AnalysisResults contracts to enforce strict Role-Based Access Control (RBAC) for the Cerberus and Argus agents.
+
+**Batch Writing Service:** Buffers high-volume analysis reports and commits them to the network in gas-optimized batches (reducing transaction costs by ~97%).
+
+**Hybrid Storage Strategy:** Stores lightweight verdicts (Risk Scores) on-chain while anchoring detailed forensic reports to IPFS via Pinata.
+
+**Governance Multisig:** Implements a 3-of-5 signature scheme for critical system upgrades and emergency stops.
+
+**Repository:** [Link to GOLEM]()
 
 ## �️ System Architecture
 
@@ -222,16 +239,7 @@ We welcome contributions to any of the four repositories! Please see individual 
 
 ## 📄 License
 
-[Specify License Here]
-
----
-
-## 🔗 Links
-
-- **Documentation:** [Link to Docs](#)
-- **Research Paper:** [Link to Paper](#)
-- **Demo Video:** [Link to Demo](#)
-- **Contact:** [Your Contact Info]
+None
 
 ---
 
