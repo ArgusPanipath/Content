@@ -1,226 +1,238 @@
-# Argus - Distributed Leader Election & Auditor System
+# 🛡️ Argus: The Supply Chain Sentinel
 
-A robust leader election system for supply chain security scanning, coordinating multiple auditor nodes using Redis with strict Leader-Follower role separation.
+**Tagline:** A dual-engine defense system (Gatekeeper + Auditor) securing the open-source supply chain against typosquatting, social engineering, and dormant malware.
 
-## Architecture (Refactored)
+---
 
-The system implements a **strict separation** between Leader and Follower roles:
+## 🚀 Project Overview
 
-### Consensus Layer
-- **Redis Lease Pattern** (King of the Hill) for leader election
-- **Heartbeat Monitoring** with 3-miss fault tolerance
-- **Node Health Tracking** using ephemeral keys with TTL
-- **Automatic Failover** when leader fails
+Modern software relies on **"blind trust"** in open-source registries. **Argus Panipath** replaces this with **"Verified Truth."** We use a **Gatekeeper** to block malicious updates in real-time and an **Auditor (Leader Election)** to continuously scan the existing ecosystem for latent threats using distributed AI.
 
-### Leader Responsibilities (Runs ONLY on elected leader)
-1. **Graph Search**: Query dependency graph for vulnerable packages
-2. **Randomised Accepter**: Stochastically filter to 20% of results
-3. **Queue Push**: Add filtered tasks to `LEADER_QUEUE`
+---
 
-### Follower Responsibilities (Runs on ALL non-leader nodes)
-1. **Task Consumption**: Pop tasks from `LEADER_QUEUE` (BLPOP)
-2. **3-Step Pipeline**:
-   - **Gemma Code Check** (stub for LLM integration)
-   - **RAG Vulnerability Lookup** (stub for vector DB)
-   - **Blockchain Commit** (stub for Polygon integration)
+## 📂 Repository Breakdown
 
-## Components
+Our system is modularized into four specialized repositories. Here is how they fit into the architecture:
 
-### Configuration (`auditor/config.py`)
-Centralized configuration for Redis keys and system constants:
-- `LEADER_KEY`, `LEADER_QUEUE`, `NODE_HEALTH_PREFIX`
-- TTL, heartbeat intervals, filter percentage
+### 1. **static_params** (The First Line of Defense)
 
-### Infrastructure (`auditor/infra/`)
-- `redis_client.py`: Singleton Redis connection manager with retry logic
+**Role:** The Filter Gateway & Static Registry.
 
-### Core (`auditor/core/`)
-- `consensus.py`: Enhanced consensus engine with heartbeat and fault tolerance
-- `leader.py`: Leader orchestrator (graph search + filtering + scheduling)
-- `follower.py`: Follower worker with 3-step pipeline (all stubs)
-- `data.py`: Mock GraphDB and VulnerabilityIndexer
+**Function:** This module acts as the initial firewall for incoming packages. It houses the lightweight, high-speed rules used to reject obvious threats before they reach the expensive AI layers.
 
-### Main (`auditor/main.py`)
-Orchestrator with dynamic role switching:
-- **Consensus Thread**: Manages leader election
-- **Heartbeat Thread**: Maintains node health (all nodes)
-- **Role Thread**: Runs LeaderOrchestrator OR FollowerWorker based on consensus
+**Key Capabilities:**
+- **Metadata Filtering:** Validates package names, versions, and author details.
+- **Static Testing Modules:** Runs rapid checks for "Entropy" (obfuscated code), dangerous API calls, and known malicious signatures.
+- **Tech:** JavaScript/Python, Regex Engines.
 
-## Installation
+**Repository:** [Link to static_params](#)
 
-```bash
-pip install -r requirements.txt
+---
+
+### 2. **Dependancy_graph_builder** (The Map)
+
+**Role:** The Graph Database Construction Engine.
+
+**Function:** Builds and maintains the massive "Graph DB of Packages". It ingests raw data from npm/PyPI and maps the complex web of dependencies to depth 10+.
+
+**Key Capabilities:**
+- **Ingestion Pipeline:** Asynchronously fetches package updates.
+- **Cluster Analysis:** Identifies "Dependency Clusters" to help the Auditor prioritize high-impact libraries.
+- **Neo4j Integration:** Stores the "Shadow Graph" for fast lookups without querying the public registry API every time.
+
+**Repository:** [Link to Dependancy_graph_builder](#)
+
+---
+
+### 3. **llm-council** (The Judge)
+
+**Role:** The Council LLM & Consensus Engine.
+
+**Function:** The "Brain" of the Gatekeeper. When code passes static checks, it enters this layer where multiple LLM agents (e.g., Gemini, Llama) vote on its safety.
+
+**Key Capabilities:**
+- **Code Understanding:** Analyzes obfuscated logic that static tools miss.
+- **Final Conscience:** Aggregates votes from different models to reach a "Decision Box" verdict (Flag/Alert).
+- **Context Saving:** Packages the reasoning to be stored on the Blockchain.
+
+**Repository:** [Link to llm-council](#)
+
+---
+
+### 4. **LeaderElection** (The Auditor / The Swarm)
+
+**Role:** The Distributed Auditor System.
+
+**Function:** Manages the background scanning of millions of existing packages. It uses a Leader-Follower architecture to distribute work across multiple nodes without duplication.
+
+**Architecture Components:**
+
+#### Leader Node:
+- **Consensus Algorithm:** Uses Redis Lease ("Life TTL") to maintain authority.
+- **Randomised Accepter:** Stochastically selects high-priority clusters from the Graph DB.
+- **Queue Push:** Assigns tasks to the "Leader Queue".
+
+#### Follower Nodes:
+- **Gemma for Code Check:** Runs localized LLM inference.
+- **RAG Vulnerability Finder:** Queries the Vector DB for historical attack patterns.
+- **Blockchain Commit:** Writes the final audit report to the immutable ledger.
+
+**Repository:** [Link to LeaderElection](#)
+
+---
+
+## �️ System Architecture
+
+Our solution is divided into two autonomous flows:
+
+### Flow A: The Gatekeeper (Real-Time)
+
+**Trigger:** New npm publish event.
+
+**Process:** `static_params` (Filter) → `llm-council` (Analysis) → Blockchain Decision.
+
+**Goal:** Stop the attack before it enters the registry.
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Package   │────▶│   Static    │────▶│ LLM Council │
+│   Upload    │     │   Params    │     │   (Judge)   │
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+                                               ▼
+                                        ┌─────────────┐
+                                        │ Blockchain  │
+                                        │  Decision   │
+                                        └─────────────┘
 ```
 
-## Configuration
+### Flow B: The Leader Election (Background)
 
-Ensure Redis is running:
+**Trigger:** Scheduled Audit / Heartbeat.
+
+**Process:** `Dependancy_graph_builder` (Map) → `LeaderElection` (Assign) → Follower Nodes (Execute).
+
+**Goal:** Find dormant threats (Sleeper Agents) that are already inside.
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Dependency     │────▶│     Leader      │────▶│    Follower     │
+│  Graph Builder  │     │    Election     │     │     Nodes       │
+│   (Neo4j Map)   │     │  (Consensus)    │     │  (AI Workers)   │
+└─────────────────┘     └─────────────────┘     └────────┬────────┘
+                                                          │
+                                                          ▼
+                                                   ┌─────────────┐
+                                                   │ Blockchain  │
+                                                   │   Commit    │
+                                                   └─────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| **Core** | Python 3.10+ |
+| **Databases** | Neo4j (Graph), Redis (Consensus/Queue), Vector DB (RAG) |
+| **AI Models** | Gemini Pro (Council), Gemma (Local Follower) |
+| **Infrastructure** | Docker, Polygon Blockchain (L2) |
+| **Orchestration** | Leader Election (Redis Lease Pattern) |
+
+---
+
+## 🏁 Getting Started
+
+To run the full system, clone the repositories and start the orchestration:
+
+### 1. Initialize the Graph
+Run `Dependancy_graph_builder` to seed the Neo4j instance.
+
 ```bash
-docker run -d -p 6379:6379 redis:7-alpine
-# OR
+cd Dependancy_graph_builder
+docker-compose up -d
+python -m graph_builder.main
+```
+
+### 2. Start the Gatekeeper
+Deploy `static_params` and `llm-council` as microservices.
+
+```bash
+cd static_params
+docker-compose up -d
+
+cd ../llm-council
 docker-compose up -d
 ```
 
-## Usage
+### 3. Unleash the Swarm
+Run `LeaderElection` on multiple nodes. One will automatically become Leader; the others will start processing the queue.
 
-### Single Node
 ```bash
-python -m auditor.main --node-id node-A
-```
+cd LeaderElection
+docker run -d -p 6379:6379 redis:7-alpine
 
-### Multiple Nodes (Different Terminals)
-```bash
-# Terminal 1
+# Terminal 1 - Node A
 python -m auditor.main --node-id node-A
 
-# Terminal 2
+# Terminal 2 - Node B
 python -m auditor.main --node-id node-B
 
-# Terminal 3
+# Terminal 3 - Node C
 python -m auditor.main --node-id node-C
 ```
 
-### Custom Configuration
-```bash
-python -m auditor.main --ttl 10 --heartbeat-interval 3
-```
+---
 
-## How It Works
+## 📊 Key Features
 
-### Consensus Thread (All Nodes)
-- Runs every `TTL/2` seconds
-- Attempts to claim leadership using Redis SETNX
-- Triggers role change when leadership status changes
+### Real-Time Protection
+- ⚡ **Sub-second filtering** with static_params
+- 🧠 **Multi-LLM consensus** for complex threats
+- 🚫 **Immediate blocking** of malicious packages
 
-### Heartbeat Thread (All Nodes)
-- Runs every 2 seconds (configurable)
-- Registers node health with ephemeral key
-- Leader refreshes lease TTL
-- Tracks missed heartbeats (abdicates after 3 misses)
+### Background Auditing
+- 🔍 **Continuous scanning** of existing packages
+- 📈 **Priority-based** cluster analysis
+- 🤖 **Distributed AI** processing with fault tolerance
 
-### Leader Orchestrator (Leader Only)
-1. Query graph database for vulnerable packages
-2. Apply 20% randomized filter
-3. Push selected packages to `LEADER_QUEUE`
-4. Repeat every 10 seconds
+### Immutable Audit Trail
+- ⛓️ **Blockchain storage** of all decisions
+- 📝 **Transparent reasoning** from LLM council
+- 🔒 **Tamper-proof** security reports
 
-### Follower Worker (Followers Only)
-1. Block on `BLPOP` waiting for tasks from `LEADER_QUEUE`
-2. Execute 3-step pipeline:
-   - Run Gemma code check (stub)
-   - Query RAG indexer (stub)
-   - Save to blockchain (stub)
-3. Repeat continuously
+---
 
-## Key Logs
+## 🎯 Use Cases
 
-Watch for these events:
+1. **Typosquatting Detection:** Catch packages with names similar to popular libraries
+2. **Social Engineering:** Identify suspicious author patterns and metadata
+3. **Dormant Malware:** Find "sleeper agents" that activate after installation
+4. **Supply Chain Attacks:** Detect compromised maintainer accounts
+5. **Obfuscated Code:** Analyze intentionally hidden malicious logic
 
-**Consensus:**
-- `👑 Node X claimed LEADERSHIP` - Node became leader
-- `👥 Node X lost leadership` - Node became follower
-- `💓 Heartbeat sent` - Node health update
+---
 
-**Leader:**
-- `🔍 Querying dependency graph...` - Graph search started
-- `🎲 Randomised filter: selected 20%` - Filtering applied
-- `📤 Pushed N tasks to queue` - Tasks scheduled
+## 🤝 Contributing
 
-**Follower:**
-- `📥 Received task: package@version` - Task received
-- `🤖 [STUB] Running Gemma code check...` - Pipeline step 1
-- `🔍 [STUB] Querying RAG indexer...` - Pipeline step 2
-- `⛓️  [STUB] Saving to blockchain...` - Pipeline step 3
-- `✅ Pipeline complete` - Task finished
+We welcome contributions to any of the four repositories! Please see individual repository READMEs for specific contribution guidelines.
 
-## Architecture Diagram
+---
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Consensus Layer                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │   Election   │  │  Heartbeat   │  │ Node Health  │  │
-│  │  (SETNX)     │  │  (3-miss)    │  │  Tracking    │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-└─────────────────────────────────────────────────────────┘
-                           │
-          ┌────────────────┴────────────────┐
-          │                                  │
-┌─────────▼──────────┐            ┌─────────▼──────────┐
-│      LEADER        │            │     FOLLOWER       │
-│  ┌──────────────┐  │            │  ┌──────────────┐  │
-│  │ Graph Search │  │            │  │ Pop from     │  │
-│  └──────┬───────┘  │            │  │ Queue        │  │
-│  ┌──────▼───────┐  │            │  └──────┬───────┘  │
-│  │ Randomised   │  │            │  ┌──────▼───────┐  │
-│  │ Filter (20%) │  │            │  │ Gemma Check  │  │
-│  └──────┬───────┘  │            │  │   (stub)     │  │
-│  ┌──────▼───────┐  │            │  └──────┬───────┘  │
-│  │ Push to      │  │            │  ┌──────▼───────┐  │
-│  │ LEADER_QUEUE │  │            │  │ RAG Lookup   │  │
-│  └──────────────┘  │            │  │   (stub)     │  │
-└────────────────────┘            │  └──────┬───────┘  │
-                                   │  ┌──────▼───────┐  │
-                                   │  │ Blockchain   │  │
-                                   │  │   (stub)     │  │
-                                   │  └──────────────┘  │
-                                   └────────────────────┘
-```
+## 📄 License
 
-## Edge Cases Handled
+[Specify License Here]
 
-- **Redis Connection Loss**: Automatic reconnection with retry logic
-- **Leader Failure**: Automatic failover within `TTL` seconds
-- **Heartbeat Misses**: Leader abdicates after 3 consecutive misses
-- **Graceful Shutdown**: Leader abdicates, workers finish current task
-- **Split Brain Prevention**: Redis SETNX ensures only one leader
-- **Node Health**: Ephemeral keys expire if node crashes
+---
 
-## Follower Pipeline Stubs
+## 🔗 Links
 
-The follower pipeline methods are **intentionally left as stubs**:
+- **Documentation:** [Link to Docs](#)
+- **Research Paper:** [Link to Paper](#)
+- **Demo Video:** [Link to Demo](#)
+- **Contact:** [Your Contact Info]
 
-```python
-def run_gemma_check(package_data):
-    # TODO: Implement Gemma LLM integration
-    pass
+---
 
-def query_rag_indexer(package_data):
-    # TODO: Query Vector DB
-    pass
-
-def save_conclusion_to_blockchain(result):
-    # TODO: Commit to Polygon
-    pass
-```
-
-These will be implemented in future sprints:
-- **Sprint 2**: Gemma LLM integration
-- **Sprint 3**: RAG vector database
-- **Sprint 4**: Blockchain commit
-
-## Testing
-
-Run the demo:
-```bash
-./demo.py
-```
-
-Run comprehensive tests:
-```bash
-./test_system.py
-```
-
-## Breaking Changes from v1
-
-- **Queue Name**: `argus:tasks` → `argus:leader_queue`
-- **Classes**: `LeaderElector` → `ConsensusManager`, `AuditScheduler` → `LeaderOrchestrator`, `AuditWorker` → `FollowerWorker`
-- **Behavior**: Strict role separation (leader doesn't execute tasks, followers don't schedule)
-
-## Next Steps
-
-1. Implement Gemma LLM integration in `follower.py`
-2. Implement RAG vector database in `follower.py`
-3. Implement blockchain commit in `follower.py`
-4. Replace mock GraphDB with real Neo4j queries
-5. Add metrics and monitoring
+**Built with ❤️ to secure the open-source ecosystem**
