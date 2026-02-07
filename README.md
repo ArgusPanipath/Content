@@ -96,7 +96,9 @@ Our system is modularized into four specialized repositories. Here is how they f
 
 **Governance Multisig:** Implements a 3-of-5 signature scheme for critical system upgrades and emergency stops.
 
-**Repository:** [Link to GOLEM]()
+**Repository:** [Link to GOLEM](https://github.com/ArgusPanipath/GOLEM)
+
+---
 
 ## �️ System Architecture
 
