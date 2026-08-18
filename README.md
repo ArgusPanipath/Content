@@ -1,6 +1,15 @@
+<div align="center">
+
 # 🛡️ Argus: The Supply Chain Sentinel
 
-**Tagline:** A dual-engine defense system (Gatekeeper + Auditor) securing the open-source supply chain against typosquatting, social engineering, and dormant malware.
+**A dual-engine defense system (Gatekeeper + Auditor) securing the open-source supply chain against typosquatting, social engineering, and dormant malware.**
+
+[![License](https://img.shields.io/badge/license-Unlicensed-lightgrey)](#-license)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](#️-tech-stack)
+[![Blockchain](https://img.shields.io/badge/ledger-Polygon-8247e5)](#-golem-the-immutable-ledger--the-settlement-layer)
+[![Status](https://img.shields.io/badge/status-active%20development-brightgreen)](#-getting-started)
+
+</div>
 
 ---
 
@@ -10,9 +19,22 @@ Modern software relies on **"blind trust"** in open-source registries. **Argus P
 
 ---
 
+## 📋 Table of Contents
+
+- [Repository Breakdown](#-repository-breakdown)
+- [System Architecture](#️-system-architecture)
+- [Tech Stack](#️-tech-stack)
+- [Getting Started](#-getting-started)
+- [Key Features](#-key-features)
+- [Use Cases](#-use-cases)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
 ## 📂 Repository Breakdown
 
-Our system is modularized into four specialized repositories. Here is how they fit into the architecture:
+Our system is modularized into five specialized repositories. Here is how they fit into the architecture:
 
 ### 1. **static_params** (The First Line of Defense)
 
@@ -100,7 +122,7 @@ Our system is modularized into four specialized repositories. Here is how they f
 
 ---
 
-## �️ System Architecture
+## 🗺️ System Architecture
 
 Our solution is divided into two autonomous flows:
 
@@ -241,8 +263,14 @@ We welcome contributions to any of the four repositories! Please see individual 
 
 ## 📄 License
 
-None
+No license has been specified for this project yet.
 
 ---
 
+<div align="center">
+
 **Built with ❤️ to secure the open-source ecosystem**
+
+[⬆ Back to top](#️-argus-the-supply-chain-sentinel)
+
+</div>
